@@ -6,15 +6,17 @@ using User.Services.Models;
 
 namespace User.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IIszrClient _iszrClient;
+    private readonly IClockService _clockService;
 
-    public UserService(IUserRepository userRepository, IIszrClient iszrClient)
+    public UserService(IUserRepository userRepository, IIszrClient iszrClient, IClockService clockService)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _iszrClient = iszrClient ?? throw new ArgumentNullException(nameof(iszrClient));
+        _clockService = clockService ?? throw new ArgumentNullException(nameof(clockService));
     }
 
     public async Task<Guid> CreateUser(CreateUserModel createUserModel)
@@ -28,6 +30,7 @@ public class UserService
         
         var userEntity = new UserEntity
         {
+            Id = Guid.NewGuid(),
             FirstName = createUserModel.FirstName,
             LastName = createUserModel.LastName,
             DateOfBirth = createUserModel.DateOfBirth,
@@ -45,7 +48,7 @@ public class UserService
 
         if (userEntity is null)
         {
-            return null;
+            throw new EntityNotFoundException();
         }
         
         return new GetUserModel
@@ -90,5 +93,13 @@ public class UserService
         }
         
         await _userRepository.Update(userEntity);
+    }
+
+    public async Task<int> GetUserAge(Guid id)
+    {
+        var user = await GetUser(id);
+        var utcNow = _clockService.NowUtc();
+        var delta = (utcNow - user!.DateOfBirth);
+        return (int)(delta.TotalDays / 325.25d);
     }
 }

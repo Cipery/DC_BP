@@ -18,7 +18,7 @@ builder.Services.AddHttpClient();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IIszrClient, IszrClient>();
 builder.Services.Configure<IszrClientConfiguration>(builder.Configuration.GetSection("IszrClient"));
@@ -46,15 +46,15 @@ app.UseHttpsRedirection();
 
 // app.MapControllers();
 
-app.MapGet("/users/{id}", async (Guid id, UserService userService) => Results.Ok(await userService.GetUser(id)));
+app.MapGet("/users/{id}", async (Guid id, IUserService userService) => Results.Ok(await userService.GetUser(id)));
 
-app.MapPost("/user", async (CreateUserModel user, UserService userService) =>
+app.MapPost("/user", async (CreateUserModel user, IUserService userService) =>
 {
     var id = await userService.CreateUser(user);
     return Results.Created($"/user/{id}", null);
 });
 
-app.MapPut("/user/{id}", async (Guid id, UpdateUserModel updateUser, UserService userService) =>
+app.MapPut("/user/{id}", async (Guid id, UpdateUserModel updateUser, IUserService userService) =>
 {
     if (id != updateUser.Id)
     {
@@ -65,10 +65,15 @@ app.MapPut("/user/{id}", async (Guid id, UpdateUserModel updateUser, UserService
     return Results.NoContent();
 });
 
-app.MapDelete("/user/{id}", async (Guid id, UserService userService) =>
+app.MapDelete("/user/{id}", async (Guid id, IUserService userService) =>
 {
     await userService.DeleteUser(id);
     return Results.Ok();
 });
+
+app.MapGet("/user/age", async (Guid id, IUserService userService) => Results.Ok(new GetUserAgeModel
+{
+    Age = await userService.GetUserAge(id)
+}));
 
 app.Run();

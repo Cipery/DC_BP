@@ -23,13 +23,6 @@ public class UserRepository : IUserRepository
         return Save();
     }
 
-    public async Task Remove(Guid id)
-    {
-        var user = await Get(id);
-        _dbContext.Users.Remove(user);
-        await Save();
-    }
-    
     public async Task Remove(UserEntity user)
     {
         _dbContext.Users.Remove(user);

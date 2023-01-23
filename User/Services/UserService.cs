@@ -75,6 +75,11 @@ public class UserService : IUserService
     
     public async Task UpdateUser(UpdateUserModel updateUserModel)
     {
+        if (updateUserModel.FirstName is null && updateUserModel.LastName is null)
+        {
+            throw new InvalidOperationException();
+        }
+        
         var userEntity = await _userRepository.Get(updateUserModel.Id);
 
         if (userEntity is null)
@@ -98,8 +103,12 @@ public class UserService : IUserService
     public async Task<int> GetUserAge(Guid id)
     {
         var user = await GetUser(id);
+        if (user is null)
+        {
+            throw new EntityNotFoundException();
+        }
         var utcNow = _clockService.NowUtc();
         var delta = (utcNow - user!.DateOfBirth);
-        return (int)(delta.TotalDays / 325.25d);
+        return (int)(delta.TotalDays / 365.25d);
     }
 }

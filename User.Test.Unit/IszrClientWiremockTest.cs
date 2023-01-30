@@ -20,7 +20,7 @@ public class IszrClientWiremockTest : IClassFixture<IszrApiServerFixture>
     private readonly IszrApiServerFixture _iszrApiServer;
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
 
-    IszrClientWiremockTest(IszrApiServerFixture iszrApiServer)
+    public IszrClientWiremockTest(IszrApiServerFixture iszrApiServer)
     {
         _iszrApiServer = iszrApiServer.GetResetInstance();
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();

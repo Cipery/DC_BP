@@ -18,6 +18,7 @@ builder.Services.AddHttpClient();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IClockService, ClockService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IIszrClient, IszrClient>();
@@ -27,11 +28,14 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
+#if DEBUG
+// TODO: Migrace by neměly běžet při spuštění aplikace. Lepší je např. migrace v CI/CD, či ruční aplikace SQL skriptů
 using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<UserDbContext>();
     dataContext.Database.Migrate();
 }
+#endif
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

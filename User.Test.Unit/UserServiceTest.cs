@@ -116,7 +116,6 @@ public class UserServiceTest
         var userId = Guid.NewGuid();
         UserRepositorMock.Setup(repository => repository.Get(userId)).ReturnsAsync((UserEntity?)null);
         Func<Task<GetUserModel?>> result = () => Sut.GetUser(userId);
-
         // Act and Assert
         await result.Should().ThrowAsync<EntityNotFoundException>();
         UserRepositorMock.VerifyAll();

@@ -2,7 +2,7 @@
 
 namespace User.Clients;
 
-public class GetRuianByBirthNumberResponse
+public class GetRuianByBirthNumberResponseModel
 {
     [JsonPropertyName("ruian")]
     public int? Ruian { get; set; }

@@ -2,5 +2,5 @@
 
 public interface IIszrClient
 {
-    Task<int?> GetRuianByBirthNumber(string birthNumber);
+    Task<int> GetRuianByBirthNumber(string birthNumber);
 }

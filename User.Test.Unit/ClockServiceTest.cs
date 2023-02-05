@@ -19,6 +19,6 @@ public class ClockServiceTest
         
         // Assert
         now.Kind.Should().Be(DateTimeKind.Utc);
-        now.Should().BeCloseTo(expectedUtcNow, TimeSpan.FromSeconds(5));
+        now.Should().BeCloseTo(expectedUtcNow, TimeSpan.FromMilliseconds(50));
     }
 }

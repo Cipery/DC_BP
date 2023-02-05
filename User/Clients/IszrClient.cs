@@ -17,7 +17,7 @@ public class IszrClient : IIszrClient
         _logger = logger;
     }
 
-    public async Task<int?> GetRuianByBirthNumber(string birthNumber)
+    public async Task<int> GetRuianByBirthNumber(string birthNumber)
     {
         var client = _httpClientFactory.CreateClient();
         var response = await client.GetAsync($"{_apiUrl}/ruian/{birthNumber}");
@@ -31,7 +31,20 @@ public class IszrClient : IIszrClient
             throw new IszrException(StatusCodes.Status500InternalServerError);
         }
 
-        var responseModel = await response.Content.ReadFromJsonAsync<GetRuianByBirthNumberResponseModel>();
-        return responseModel?.Ruian;
+        GetRuianByBirthNumberResponseModel? responseModel = null;
+        try
+        {
+            responseModel = await response.Content.ReadFromJsonAsync<GetRuianByBirthNumberResponseModel>();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while deserialize response from ISZR");
+        }
+        
+        if (responseModel?.Ruian == null || !responseModel.Ruian.HasValue)
+        {
+            throw new RuianNotFoundException();
+        }
+        return responseModel.Ruian.Value;
     }
 }

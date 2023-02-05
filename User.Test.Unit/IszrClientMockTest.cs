@@ -91,7 +91,7 @@ public class IszrClientMockTest
                 ApiUrl = "http://iszr-api"
             }), _httpClientFactoryMock.Object);
 
-        Func<Task<int?>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
+        Func<Task<int>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
         
         // Act and Assert
         var assertion = await call.Should().ThrowAsync<IszrException>();
@@ -128,7 +128,7 @@ public class IszrClientMockTest
                 ApiUrl = "http://iszr-api"
             }), _httpClientFactoryMock.Object);
 
-        Func<Task<int?>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
+        Func<Task<int>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
         // Act and Assert
         var assertion = await call.Should().ThrowAsync<IszrException>();
         assertion.Where(e => e.HttpStatusCode == StatusCodes.Status500InternalServerError);

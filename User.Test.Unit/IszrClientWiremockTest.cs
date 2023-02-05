@@ -85,7 +85,7 @@ public class IszrClientWiremockTest : IClassFixture<IszrApiServerFixture>
                 ApiUrl = _iszrApiServer.Server.Url
             }), _httpClientFactoryMock.Object);
         
-        Func<Task<int?>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
+        Func<Task<int>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
         // Act and Assert
         var assertion = await call.Should().ThrowAsync<IszrException>();
         assertion.Where(e => e.HttpStatusCode == StatusCodes.Status404NotFound);
@@ -118,7 +118,7 @@ public class IszrClientWiremockTest : IClassFixture<IszrApiServerFixture>
                 ApiUrl = _iszrApiServer.Server.Url
             }), _httpClientFactoryMock.Object);
         
-        Func<Task<int?>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
+        Func<Task<int>> call = () => iszrClient.GetRuianByBirthNumber(birthNumber);
         // Act and Assert
         var assertion = await call.Should().ThrowAsync<IszrException>();
         assertion.Where(e => e.HttpStatusCode == StatusCodes.Status500InternalServerError);

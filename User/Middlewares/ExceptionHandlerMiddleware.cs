@@ -31,7 +31,6 @@ public class ExceptionHandlerMiddleware
     {
         var statusCode = exception switch
         {
-            BadHttpRequestException badRequest => StatusCodes.Status400BadRequest,
             ApiException apiException => apiException.HttpStatusCode,
             _ => StatusCodes.Status500InternalServerError
         };

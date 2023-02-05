@@ -23,10 +23,7 @@ public class UserService : IUserService
     {
         var ruian = await _iszrClient.GetRuianByBirthNumber(createUserModel.BirthNumber);
 
-        if (ruian is null)
-        {
-            throw new RuianNotFoundException();
-        }
+        createUserModel.DateOfBirth = DateTime.SpecifyKind(createUserModel.DateOfBirth, DateTimeKind.Utc);
         
         var userEntity = new UserEntity
         {
@@ -57,7 +54,7 @@ public class UserService : IUserService
             Ruian = userEntity.Ruian,
             FirstName = userEntity.FirstName,
             LastName = userEntity.LastName,
-            DateOfBirth = userEntity.DateOfBirth
+            DateOfBirth = userEntity.DateOfBirth.DateTime
         };
     }
 
@@ -102,13 +99,15 @@ public class UserService : IUserService
 
     public async Task<int> GetUserAge(Guid id)
     {
-        var user = await GetUser(id);
-        if (user is null)
+        var userEntity = await _userRepository.Get(id);
+
+        if (userEntity is null)
         {
             throw new EntityNotFoundException();
         }
+        
         var utcNow = _clockService.NowUtc();
-        var delta = (utcNow - user!.DateOfBirth);
+        var delta = (utcNow - userEntity!.DateOfBirth);
         return (int)(delta.TotalDays / 365.25d);
     }
 }

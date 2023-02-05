@@ -66,7 +66,7 @@ public class UserServiceTest
     }
     
     [Fact]
-    public async Task CreateUser_ShouldThrow_WhenRuainIsNotFound()
+    public async Task CreateUser_ShouldThrow_WhenIszrClientThrows()
     {
         // Arrange
         var ruian = 12345;
@@ -78,7 +78,7 @@ public class UserServiceTest
             LastName = "Gurblanski"
         };
         IszrClientMock.Setup(client => client.GetRuianByBirthNumber(requestModel.BirthNumber))
-            .ReturnsAsync((int?) null);
+            .ThrowsAsync(new RuianNotFoundException());
         Func<Task<Guid>> result = () => Sut.CreateUser(requestModel);
         
         // Act and Assert
@@ -105,7 +105,7 @@ public class UserServiceTest
         getUserResponse.FirstName.Should().Be(UserEntity_1.FirstName);
         getUserResponse.LastName.Should().Be(UserEntity_1.LastName);
         getUserResponse.Ruian.Should().Be(UserEntity_1.Ruian);
-        getUserResponse.DateOfBirth.Should().Be(UserEntity_1.DateOfBirth);
+        getUserResponse.DateOfBirth.Should().Be(UserEntity_1.DateOfBirth.DateTime);
         UserRepositorMock.VerifyAll();
     }
     

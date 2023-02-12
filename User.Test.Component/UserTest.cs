@@ -9,8 +9,10 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using User.Clients;
+using User.Repositories;
 using User.Services.Models;
 using User.Test.Component.Utils;
 using User.Test.Unit;
@@ -21,7 +23,8 @@ using Xunit.Abstractions;
 
 namespace User.Test.Component;
 
-public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<IszrApiServerFixture>
+[Collection(DatabaseWiremockCollectionFixture.CollectionName)]
+public class UserTest
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly IszrApiServerFixture _iszrApiServer;
@@ -34,7 +37,8 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         DateOfBirth = new DateTime(1989, 10, 14)
     };
     
-    public UserTest(UserWebApplicationFactory factory, ITestOutputHelper testOutputHelper, IszrApiServerFixture iszrApiServer)
+    public UserTest(UserWebApplicationFactory factory, IszrApiServerFixture iszrApiServer,
+        ITestOutputHelper testOutputHelper)
     {
         _iszrApiServer = iszrApiServer.GetResetInstance();
         _factory = factory.WithTestOutputHelper(testOutputHelper);
@@ -47,7 +51,8 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         var (response, _) = await CreateUserViaApi(12345);
 
         // Assert
-        response.IsSuccessStatusCode.Should().BeTrue();
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.Location.Should().NotBeNull();
     }
 
     private async Task<(HttpResponseMessage response, HttpClient client)> CreateUserViaApi(int ruian)
@@ -73,7 +78,7 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         }).CreateClient();
 
         // Act
-        var response = await HttpClientJsonExtensions.PostAsJsonAsync(client, "/user", _createUserModel);
+        var response = await client.PostAsJsonAsync("/user", _createUserModel);
         return (response, client);
     }
 
@@ -89,7 +94,7 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         }).CreateClient();
 
         // Act
-        var response = await HttpClientJsonExtensions.PostAsJsonAsync(client, "/user", new { });
+        var response = await client.PostAsJsonAsync( "/user", new { });
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -119,7 +124,7 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         }).CreateClient();
 
         // Act
-        var response = await HttpClientJsonExtensions.PostAsJsonAsync(client, "/user", _createUserModel);
+        var response = await client.PostAsJsonAsync( "/user", _createUserModel);
         
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -147,7 +152,7 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         }).CreateClient();
 
         // Act
-        var response = await HttpClientJsonExtensions.PostAsJsonAsync(client, "/user", _createUserModel);
+        var response = await client.PostAsJsonAsync( "/user", _createUserModel);
         
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -177,7 +182,7 @@ public class UserTest : IClassFixture<UserWebApplicationFactory>, IClassFixture<
         }).CreateClient();
 
         // Act
-        var response = await HttpClientJsonExtensions.PostAsJsonAsync(client, "/user", _createUserModel);
+        var response = await client.PostAsJsonAsync( "/user", _createUserModel);
         
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

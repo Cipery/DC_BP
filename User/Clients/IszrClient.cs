@@ -39,9 +39,10 @@ public class IszrClient : IIszrClient
         catch (Exception e)
         {
             _logger.LogError(e, "Error while deserialize response from ISZR");
+            throw new ApiException(StatusCodes.Status500InternalServerError);
         }
         
-        if (responseModel?.Ruian == null || !responseModel.Ruian.HasValue)
+        if (responseModel?.Ruian == null)
         {
             throw new RuianNotFoundException();
         }

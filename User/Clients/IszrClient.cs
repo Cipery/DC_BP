@@ -38,7 +38,7 @@ public class IszrClient : IIszrClient
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while deserialize response from ISZR");
+            _logger.LogError(e, "Error while deserialization of response from ISZR");
             throw new ApiException(StatusCodes.Status500InternalServerError);
         }
         

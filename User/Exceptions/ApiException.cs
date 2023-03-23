@@ -1,4 +1,6 @@
-﻿namespace User.Exceptions;
+﻿using System.Net;
+
+namespace User.Exceptions;
 
 public class ApiException : Exception
 {
@@ -9,4 +11,8 @@ public class ApiException : Exception
         HttpStatusCode = httpStatusCode;
     }
 
+    public ApiException(HttpStatusCode httpStatusCode, string message) : base(message)
+    {
+        HttpStatusCode = (int)httpStatusCode;
+    }
 }

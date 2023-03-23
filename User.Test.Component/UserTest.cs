@@ -188,6 +188,39 @@ public class UserTest
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }
+    
+    [Fact]
+    public async Task PostUser_ShouldReturnNotFound_WhenIszrReturnsEmptyRuian()
+    {
+        var request = Request
+            .Create()
+            .WithPath($"/ruian/{_createUserModel.BirthNumber}")
+            .UsingGet();
+
+        _iszrApiServer.Server.Given(request)
+            .RespondWith(Response.Create()
+                .WithStatusCode(StatusCodes.Status200OK)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(JsonSerializer.Serialize(new GetRuianByBirthNumberResponseModel()
+                {
+                    Ruian = null
+                })));
+
+        var client = _factory.WithWebHostBuilder(conf =>
+        {
+            conf.ConfigureTestServices(services =>
+            {
+                services.Configure<IszrClientConfiguration>(opts => { opts.ApiUrl = _iszrApiServer.Server.Url; });
+            });
+        }).CreateClient();
+
+        // Act
+        var response = await client.PostAsJsonAsync( "/user", _createUserModel);
+        
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    }
 
     [Fact]
     public async Task GetUser_ShouldGetUser_WhenUserExists()
@@ -269,6 +302,24 @@ public class UserTest
         var getUserResponse = await client.GetAsync(createUserResponse.Headers.Location);
         var getUserModel = await getUserResponse.Content.ReadFromJsonAsync<GetUserModel>();
         getUserModel.Should().BeEquivalentTo(updateUserModel, config => config.ExcludingMissingMembers());
+    }
+    
+    [Fact]
+    public async Task PutUser_ShouldReturnBadRequest_WhenNothingToUpdateIsProvidedInInputModel()
+    {
+        // Arrange
+        var (createUserResponse, client) = await CreateUserViaApi(12345);
+        var userId = createUserResponse.Headers.Location.ToString().Split("/").Last();
+        var updateUserModel = new UpdateUserModel
+        {
+            Id = Guid.Parse(userId),
+        };
+        
+        // Act
+        var response = await client.PutAsJsonAsync($"user/{userId}", updateUserModel);
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
     
     [Fact]

@@ -1,4 +1,5 @@
-﻿using User.Clients;
+﻿using System.Net;
+using User.Clients;
 using User.Entities;
 using User.Exceptions;
 using User.Repositories;
@@ -74,7 +75,7 @@ public class UserService : IUserService
     {
         if (updateUserModel.FirstName is null && updateUserModel.LastName is null)
         {
-            throw new InvalidOperationException();
+            throw new ApiException(HttpStatusCode.BadRequest, "At least one property must be set to update the user.");
         }
         
         var userEntity = await _userRepository.Get(updateUserModel.Id);

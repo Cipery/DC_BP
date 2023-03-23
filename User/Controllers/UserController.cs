@@ -8,46 +8,45 @@ namespace User.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly IUserService _userService;
     
-    public UserController(ILogger<UserController> logger)
+    public UserController(IUserService userService)
     {
-        _logger = logger;
+        _userService = userService;
     }
     
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(Guid id, [FromServices] IUserService userService) => Ok(await userService.GetUser(id));
+    public async Task<IActionResult> Get(Guid id) => Ok(await _userService.GetUser(id));
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateUserModel user, [FromServices] IUserService userService)
+    public async Task<IActionResult> Post([FromBody] CreateUserModel user)
     {
-        var id = await userService.CreateUser(user);
+        var id = await _userService.CreateUser(user);
         return Created($"/user/{id}", null);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, UpdateUserModel updateUser, [FromServices] IUserService userService)
+    public async Task<IActionResult> Put(Guid id, UpdateUserModel updateUser)
     {
         if (id != updateUser.Id)
         {
             return BadRequest();
         }
         
-        await userService.UpdateUser(updateUser);
+        await _userService.UpdateUser(updateUser);
         return NoContent();
     }
     
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id, [FromServices] IUserService userService)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await userService.DeleteUser(id);
+        await _userService.DeleteUser(id);
         return Ok();
     }
 
     [HttpGet("{id}/age")]
-    public async Task<IActionResult> GetAge(Guid id, [FromServices] IUserService userService) => Ok(new GetUserAgeModel
+    public async Task<IActionResult> GetAge(Guid id) => Ok(new GetUserAgeModel
     {
-        Age = await userService.GetUserAge(id)
+        Age = await _userService.GetUserAge(id)
     });
-
 }

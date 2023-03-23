@@ -49,8 +49,12 @@ public class UserServiceTest
             FirstName = "Daniel",
             LastName = "Gurblanski"
         };
-        IszrClientMock.Setup(client => client.GetRuianByBirthNumber(It.IsAny<string>()))
-            .ReturnsAsync(ruian);
+        
+        IszrClientMock
+            .Setup(client => client.GetRuianByBirthNumber("8910141234"))
+            .ReturnsAsync(112233);
+        
+        IszrClientMock.VerifyAll();
 
         UserRepositorMock.Setup(repository => repository.Add(It.IsAny<UserEntity>()))
             .Returns(Task.CompletedTask);
@@ -193,7 +197,7 @@ public class UserServiceTest
         // Arrange
         // Act and Assert
         Func<Task> result = () => Sut.UpdateUser(new UpdateUserModel { Id = UserEntity_1.Id });
-        await result.Should().ThrowAsync<InvalidOperationException>();
+        await result.Should().ThrowAsync<ApiException>();
         UserRepositorMock.VerifyAll();
     }
     

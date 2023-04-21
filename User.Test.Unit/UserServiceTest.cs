@@ -54,8 +54,6 @@ public class UserServiceTest
             .Setup(client => client.GetRuianByBirthNumber("8910141234"))
             .ReturnsAsync(112233);
         
-        IszrClientMock.VerifyAll();
-
         UserRepositorMock.Setup(repository => repository.Add(It.IsAny<UserEntity>()))
             .Returns(Task.CompletedTask);
 

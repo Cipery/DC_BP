@@ -25,7 +25,7 @@ public class UserRepositoryTest
         _context = CreateContext();
         _repository = new UserRepository(_context);
         _context.Database.EnsureDeleted();
-        _context.Database.EnsureCreated(); // prostor na optimalizaci, mazání celé databáze je nákladné
+        _context.Database.Migrate(); // prostor na optimalizaci, mazání celé databáze je nákladné
     }
 
     private UserDbContext CreateContext()
@@ -42,9 +42,7 @@ public class UserRepositoryTest
     [Fact]
     public async Task AddUserAsync_AddsUser()
     {
-        // Arrange
-
-        // Act
+        // Arrange & Act
         await _repository.Add(_userEntity);
 
         // Assert
@@ -77,8 +75,8 @@ public class UserRepositoryTest
         await _context.SaveChangesAsync();
         _context.ChangeTracker.Clear();
 
-        _userEntity.FirstName = "UpdatedFirstName";
-        _userEntity.LastName = "UpdatedLastName";
+        _userEntity.FirstName = "Josef";
+        _userEntity.LastName = "Lada";
 
         // Act
         await _repository.Update(_userEntity);

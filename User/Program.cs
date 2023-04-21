@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using User;
 using User.Clients;
 using User.Middlewares;
 using User.Repositories;
@@ -21,6 +22,7 @@ builder.Services.AddScoped<IClockService, ClockService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IIszrClient, IszrClient>();
+// builder.Services.AddScoped<IIszrClient, IszrStressTestClient>();
 builder.Services.Configure<IszrClientConfiguration>(builder.Configuration.GetSection("IszrClient"));
 
 var app = builder.Build();
